@@ -112,7 +112,8 @@ resource "aws_elasticache_replication_group" "this" {
   port                        = coalesce(var.port, local.port)
   preferred_cache_cluster_azs = var.preferred_cache_cluster_azs
   replicas_per_node_group     = var.replicas_per_node_group
-  replication_group_id        = var.replication_group_id
+  replication_group_id        = "rh-test" 
+  #var.replication_group_id
   security_group_names        = var.security_group_names
   security_group_ids          = local.security_group_ids
   snapshot_arns               = var.snapshot_arns
