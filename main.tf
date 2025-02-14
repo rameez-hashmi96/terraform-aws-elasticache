@@ -34,7 +34,7 @@ resource "aws_elasticache_cluster" "this" {
     for_each = { for k, v in var.log_delivery_configuration : k => v if var.engine != "memcached" && !local.in_replication_group }
 
     content {
-      destination      = try(log_delivery_configuration.value.create_cloudwatch_log_group, true) && log_delivery_configuration.value.destination_type == "none" ? aws_cloudwatch_log_group.this[log_delivery_configuration.key].name : log_delivery_configuration.value.destination
+      destination      = try(log_delivery_configuration.value.create_cloudwatch_log_group, true) && log_delivery_configuration.value.destination_type == "cloudwatch-logs" ? aws_cloudwatch_log_group.this[log_delivery_configuration.key].name : log_delivery_configuration.value.destination
       destination_type = log_delivery_configuration.value.destination_type
       log_format       = log_delivery_configuration.value.log_format
       log_type         = try(log_delivery_configuration.value.log_type, log_delivery_configuration.key)
@@ -94,7 +94,7 @@ resource "aws_elasticache_replication_group" "this" {
     for_each = { for k, v in var.log_delivery_configuration : k => v if var.engine != "memcached" }
 
     content {
-      destination      = try(log_delivery_configuration.value.create_cloudwatch_log_group, true) && (log_delivery_configuration.value.destination_type == "cloudwatch-logs" || log_delivery_configuration.value.destination_type == "none") ? aws_cloudwatch_log_group.this[log_delivery_configuration.key].name : log_delivery_configuration.value.destination
+      destination      = try(log_delivery_configuration.value.create_cloudwatch_log_group, true) && log_delivery_configuration.value.destination_type == "cloudwatch-logs" ? aws_cloudwatch_log_group.this[log_delivery_configuration.key].name : log_delivery_configuration.value.destination
       destination_type = log_delivery_configuration.value.destination_type
       log_format       = log_delivery_configuration.value.log_format
       log_type         = try(log_delivery_configuration.value.log_type, log_delivery_configuration.key)
@@ -172,7 +172,7 @@ resource "aws_elasticache_replication_group" "global" {
     for_each = { for k, v in var.log_delivery_configuration : k => v if var.engine != "memcached" }
 
     content {
-      destination      = try(log_delivery_configuration.value.create_cloudwatch_log_group, true) && log_delivery_configuration.value.destination_type == "none" ? aws_cloudwatch_log_group.this[log_delivery_configuration.key].name : log_delivery_configuration.value.destination
+      destination      = try(log_delivery_configuration.value.create_cloudwatch_log_group, true) && log_delivery_configuration.value.destination_type == "cloudwatch-logs" ? aws_cloudwatch_log_group.this[log_delivery_configuration.key].name : log_delivery_configuration.value.destination
       destination_type = log_delivery_configuration.value.destination_type
       log_format       = log_delivery_configuration.value.log_format
       log_type         = try(log_delivery_configuration.value.log_type, log_delivery_configuration.key)
@@ -217,7 +217,7 @@ locals {
 }
 
 resource "aws_cloudwatch_log_group" "this" {
-  for_each = { for k, v in var.log_delivery_configuration : k => v if local.create_cloudwatch_log_group && try(v.create_cloudwatch_log_group, true) && try(v.destination_type, "") == "none" }
+  for_each = { for k, v in var.log_delivery_configuration : k => v if local.create_cloudwatch_log_group && try(v.create_cloudwatch_log_group, true) && try(v.destination_type, "") == "cloudwatch-logs" }
 
   name              = "/aws/elasticache/${try(each.value.cloudwatch_log_group_name, coalesce(var.cluster_id, var.replication_group_id), "")}"
   retention_in_days = try(each.value.cloudwatch_log_group_retention_in_days, 14)

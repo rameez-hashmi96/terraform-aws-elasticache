@@ -85,8 +85,7 @@ variable "log_delivery_configuration" {
   type        = any
   default = {
     slow-log = {
-      #destination_type = "cloudwatch-logs"
-      destination_type = "none"
+      destination_type = "cloudwatch-logs"
       log_format       = "json"
     }
   }
